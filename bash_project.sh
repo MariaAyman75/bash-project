@@ -155,3 +155,108 @@ insert_into_table() {
     echo "Table does not exist!"
   fi
 }
+# Function to select from a table
+select_from_table() {
+  echo "Enter table name: "
+  read tablename
+  if [ ! -f "$tablename" ]
+   then
+   echo "Table does not exist!"
+   fi
+      select option in all selection projection exit
+      do 
+      case $option in
+"all")	
+	sed -n '3,$p' "$tablename"
+	;;
+"selection")
+	selection
+	;;
+"projection")
+	projection
+	;;
+"exit")
+break
+;;
+
+*)
+	echo UNKNOWN
+	break
+	;;
+
+esac
+done
+  
+}
+
+selection(){
+    # Read the first line to get column names
+read -r name < "$tablename"
+IFS=':' read -r -a col_names <<< "$name"
+
+# Prompt the user to select a column
+echo "Select a column:"
+select column in "${col_names[@]}"; do
+  if [[ -n "$column" ]]; then
+    # Get the column index
+    col_index=0
+    for i in "${!col_names[@]}"; do
+      if [[ "${col_names[$i]}" == "$column" ]]; then
+        col_index=$((i + 1))
+        break
+      fi
+    done
+
+    # Prompt the user to enter a value to search for
+    echo "Please enter value: "
+    read value
+
+    # Search for the value in the selected column
+    result=$(awk -F':' -v col="$col_index" -v val="$value" '$col ~ val {print}' "$tablename")
+
+    if [[ -n "$result" ]]; then
+      echo "$result"
+    else
+      echo "No matching rows"
+    fi
+    break
+  else
+    echo "Invalid selection. Please try again."
+  fi
+done
+  }
+
+projection(){
+     # Read the first line to get column names
+read -r name < "$tablename"
+IFS=':' read -r -a col_names <<< "$name"
+
+# Prompt the user to select a column
+echo "Select a column:"
+select column in "${col_names[@]}"; do
+  if [[ -n "$column" ]]; then
+    # Get the column index
+    col_index=0
+    for i in "${!col_names[@]}"; do
+      if [[ "${col_names[$i]}" == "$column" ]]; then
+        col_index=$((i + 1))
+        break
+      fi
+    done
+
+    
+    # Search for the value in the selected column
+    result=$(cut -d : -f "$col_index" "$tablename")
+
+    if [[ -n "$result" ]]; then
+      echo "$result"
+    else
+      echo "No matching rows"
+    fi
+    break
+  else
+    echo "Invalid selection. Please try again."
+  fi
+done
+}
+
