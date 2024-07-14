@@ -86,3 +86,9 @@ create_table() {
     echo "Table created!"
   fi
 }
+# Function to list tables
+list_tables() {
+  echo "Tables:"
+  ls
+}
+
