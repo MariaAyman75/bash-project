@@ -382,3 +382,23 @@ database_menu() {
     esac
   done
 }
+# Main menu
+while true
+ do
+  echo "Main Menu:"
+  echo "1. Create Database"
+  echo "2. List Databases"
+  echo "3. Connect To Database"
+  echo "4. Drop Database"
+  echo "5. Exit"
+  echo "Choose an option: "
+  read option
+  case $option in
+    1) create_database ;;
+    2) list_databases ;;
+    3) connect_database ;;
+    4) drop_database ;;
+    5) break ;;
+    *) echo "Invalid option!" ;;
+  esac
+done
