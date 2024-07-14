@@ -91,4 +91,18 @@ list_tables() {
   echo "Tables:"
   ls
 }
-
+# Function to drop a table
+drop_table() {
+  echo "Enter table name: "
+  read tablename
+  if [[ ! "$dbname" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]]
+   then
+    echo "Please enter a valid database name."
+  elif [ -f "$tablename" ]
+   then
+    rm "$tablename"
+    echo "Table dropped!"
+  else
+    echo "Table does not exist!"
+  fi
+}
