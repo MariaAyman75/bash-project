@@ -106,3 +106,52 @@ drop_table() {
     echo "Table does not exist!"
   fi
 }
+# Function to insert into a table
+insert_into_table() {
+  echo "Enter table name: "
+  read tablename
+  if [ -f "$tablename" ]; then
+    read -r name < "$tablename"
+    IFS=':' read -r -a col_names <<< "$name"
+    datatype=$(sed -n '2p' "$tablename")
+    IFS=':' read -r -a col_datatype <<< "$datatype"
+  
+    rowdata=()
+    for (( i=0; i<${#col_names[@]}; i++ )); do
+      while true; do
+        echo "Enter value for ${col_names[$i]} (type: ${col_datatype[$i]}):"
+        read value
+
+        # Check if value matches the expected data type
+        if [[ "${col_datatype[$i]}" == "int" ]]; then
+          if [[ ! "$value" =~ ^[0-9]+$ ]]; then
+            echo "Invalid value! Please enter an integer."
+            continue
+          fi
+        elif [[ "${col_datatype[$i]}" == "string" ]]; then
+          if [[ ! "$value" =~ ^[a-zA-Z0-9_]+$ ]]; then
+            echo "Invalid value! Please enter a string."
+            continue
+          fi
+        fi
+
+        # For the first column, check if the value is unique
+        if [[ $i -eq 0 ]]; then
+          if grep -q "^$value:" "$tablename"; then
+            echo "Value for the first column must be unique. Please enter a different value."
+            continue
+          fi
+        fi
+
+        rowdata+=("$value")
+        break
+      done
+    done
+
+    IFS=':' 
+    echo "${rowdata[*]}" >> "$tablename"
+    echo "Row inserted!"
+  else
+    echo "Table does not exist!"
+  fi
+}
