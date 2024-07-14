@@ -312,4 +312,45 @@ delete_from_table() {
     echo "Table does not exist!"
   fi
 }
+# Function to update a table
+update_table() {
+  echo "Enter table name: "
+  read tablename
+  if [ -f "$tablename" ]; then
+    echo "Enter ID of the row you want to update: "
+    read id_value
 
+    # Read the first line to get column names
+    read -r header < "$tablename"
+    IFS=':' read -r -a col_names <<< "$header"
+
+    echo "Select column to update:"
+    select column in "${col_names[@]}"; do
+      if [[ -n "$column" ]]; then
+        echo "Enter current value of the column: "
+        read current_value
+        echo "Enter new value: "
+        read new_value
+
+        col_index=0
+        for i in "${!col_names[@]}"; do
+          if [[ "${col_names[$i]}" == "$column" ]]; then
+            col_index=$((i + 1))
+            break
+          fi
+        done
+        
+        # Update the row where the ID matches
+        awk -F':' -v id="$id_value" -v col="$col_index" -v curr_val="$current_value" -v new_val="$new_value" \
+        'BEGIN {OFS=":"} $1 == id {if ($col == curr_val) $col = new_val} 1' "$tablename" > temp && mv temp "$tablename"
+
+        echo "Row with ID $id_value updated!"
+        break
+      else
+        echo "Invalid selection. Please try again."
+      fi
+    done
+  else
+    echo "Table does not exist!"
+  fi
+}
