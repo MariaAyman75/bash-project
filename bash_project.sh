@@ -259,4 +259,57 @@ select column in "${col_names[@]}"; do
   fi
 done
 }
+# Function to delete from a table
+delete_from_table() {
+  echo "Enter table name: "
+  read tablename
+  if [ -f "$tablename" ]; then
+    echo "Select delete option: 1) Delete by ID, 2) Delete by column value, 3) Delete all rows"
+    read delete_option
+    
+    case $delete_option in
+      1)
+        echo "Enter ID value: "
+        read id_value
+        sed -i "/^$id_value:/d" "$tablename"
+        echo "Row with ID $id_value deleted!"
+        ;;
+      2)
+        # Read the first line to get column names
+        read -r name < "$tablename"
+        IFS=':' read -r -a col_names <<< "$name"
+        
+        echo "Select column to delete by:"
+        select column in "${col_names[@]}"; do
+          if [[ -n "$column" ]]; then
+            echo "Enter value to delete: "
+            read value
+            col_index=0
+            for i in "${!col_names[@]}"; do
+              if [[ "${col_names[$i]}" == "$column" ]]; then
+                col_index=$((i + 1))
+                break
+              fi
+            done
+            
+            awk -F':' -v col="$col_index" -v val="$value" '$col != val' "$tablename" > temp && mv temp "$tablename"
+            echo "Rows where $column = $value deleted!"
+            break
+          else
+            echo "Invalid selection. Please try again."
+          fi
+        done
+        ;;
+      3)
+        sed -i '3,$d' "$tablename"
+        echo "All rows deleted!"
+        ;;
+      *)
+        echo "Invalid option!"
+        ;;
+    esac
+  else
+    echo "Table does not exist!"
+  fi
+}
 
