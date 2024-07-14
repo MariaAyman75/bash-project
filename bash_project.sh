@@ -27,4 +27,18 @@ list_databases() {
   echo "Databases:"
   ls 
 }
-
+# Function to connect to a database
+connect_database() {
+  echo "Enter database name: "
+  read dbname
+  if [[ ! "$dbname" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]]
+   then
+    echo "Please enter a valid database name."
+  elif [ -d "$dbname" ]
+   then
+    cd "$dbname"
+    database_menu
+  else
+    echo "Database does not exist!"
+  fi
+}
