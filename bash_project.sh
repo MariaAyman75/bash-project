@@ -22,3 +22,9 @@ create_database() {
     echo "Database created!"
   fi
 }
+# Function to list databases
+list_databases() {
+  echo "Databases:"
+  ls 
+}
+
