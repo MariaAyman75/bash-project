@@ -42,3 +42,18 @@ connect_database() {
     echo "Database does not exist!"
   fi
 }
+# Function to drop a database
+drop_database() {
+  echo "Please enter database name: "
+  read dbname
+  if [[ ! "$dbname" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]]
+   then
+    echo "Please enter a valid database name."
+  elif [ -d "$dbname" ]
+   then
+    rm -r "$dbname"
+    echo "Database $dbname dropped!"
+  else
+    echo "Database does not exist!"
+  fi
+}
